@@ -61,6 +61,57 @@ def build_bwt_for_compression(text, suffix_array):
     
     return ''.join(bwt_chars)
 
+def invert_bwt(bwt_string):
+    if not bwt_string:
+        return ""
+    
+    table = ['' for _ in range(len(bwt_string))]
+    for i in range(len(bwt_string)):
+        table = [bwt_string[j] + table[j] for j in range(len(bwt_string))]
+        table.sort()
+        
+    for row in table:
+        if row.endswith('$'):
+            return row[:-1]  
+    
+    return ""
+
+def save_bwt_to_file(bwt_string, filename):
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(bwt_string)
+    print(f"   BWT guardada en: {filename}")
+    return True
+
+def load_bwt_from_file(filename):
+    """Carga BWT desde archivo - PARA VERIFICAR REVERSIBILIDAD"""
+    with open(filename, 'r', encoding='utf-8') as f:
+        return f.read().strip()
+
+def process_text_file(filename, max_chars=5000):
+    try:
+        print(f"\n" + "="*50)
+        print(f"PROCESANDO: {filename}")
+        print("="*50)
+        
+        with open(filename, 'r', encoding='utf-8') as file:
+            text = file.read()
+        
+        # Limitar tamaño para pruebas 
+        if max_chars and len(text) > max_chars:
+            text = text[:max_chars]
+            print(f"   (limitado a {max_chars} caracteres para prueba rapida)")
+        
+        # calcular Suffix Array
+        start_time = time.time()
+        sa = suffix_array(text + '$')
+        sa_time = time.time() - start_time
+        
+        # calcular BWT
+        start_time = time.time()
+        bwt = build_bwt_for_compression(text, sa)
+        bwt_time = time.time() - start_time
+        
+
 if __name__ == "__main__":
     test_text = "mississippi"
     sa = suffix_array(test_text + '$')
