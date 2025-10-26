@@ -76,18 +76,58 @@ def invert_bwt(bwt_string):
     
     return ""
 
-def save_bwt_to_file(bwt_string, filename):
+def encode_move_to_front(text): #Codificamos el texto con MOve to Front y devolvemos lista de índices.
+    alphabet = sorted(list(set(text)))
+    mtf_lista = sorted(list(set(text)))
+    encoded = []
+    
+    for char in text:
+        idx = mtf_lista.index(char)
+        encoded.append(idx)
+        mtf_lista.pop(idx)
+        mtf_lista.insert(0, char)
+    return encoded, alphabet
+
+def decode_move_to_front(encoded, alphabet): #Decodificamos.
+    mtf_lista = alphabet.copy()
+    decoded = []
+    
+    for idx in encoded:
+        char = mtf_lista[idx]
+        decoded.append(char)
+        mtf_lista.pop(idx)
+        mtf_lista.insert(0, char)
+    return ''.join(decoded)
+
+"""def save_bwt_to_file(bwt_string, filename):
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(bwt_string)
     print(f"   BWT guardada en: {filename}")
     return True
 
 def load_bwt_from_file(filename):
-    """Carga BWT desde archivo - PARA VERIFICAR REVERSIBILIDAD"""
     with open(filename, 'r', encoding='utf-8') as f:
-        return f.read().strip()
+        return f.read().strip()"""
+        
+def lista_a_file(data_list, filename):
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(' '.join(map(str, data_list)))
+    print(f"Nuevo archivo: {filename}")
+    
+def load_lista_de_file(filename):
+    with open(filename, 'r', encoding='utf-8') as f:
+        return list(map(int, f.read().strip().split()))
 
-def process_text_file(filename, max_chars=5000):
+def alphabet_to_file(alphabet, filename):
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(''.join(alphabet))
+    print(f"Alfabeto guardado: {filename}")
+    
+def load_alphabet_from_file(filename):
+    with open(filename, 'r', encoding='utf-8') as f:
+        return list(f.read().strip())
+
+def process_text_file(filename, max_chars=500000):
     try:
         print(f"\n" + "="*50)
         print(f"PROCESANDO: {filename}")
@@ -102,7 +142,7 @@ def process_text_file(filename, max_chars=5000):
             print(f"   (limitado a {max_chars} caracteres para prueba rapida)")
         
         # calcular Suffix Array
-        start_time = time.time()
+        """start_time = time.time()
         sa = suffix_array(text + '$')
         sa_time = time.time() - start_time
         
@@ -123,18 +163,42 @@ def process_text_file(filename, max_chars=5000):
         # Calcular metricas - MEDICIoN DE TAMAÑOS
         original_size = len(text.encode('utf-8'))
         bwt_size = len(bwt.encode('utf-8'))
-        ratio = bwt_size / original_size
+        ratio = bwt_size / original_size"""
+        
+        sa = suffix_array(text + '$')
+        bwt = build_bwt_for_compression(text, sa)
+
+        mtf_encoded, alphabet = encode_move_to_front(bwt)
+        mtf_file = f"{filename}_mtf.txt"
+        alpha_file = f"{filename}_alphabet.txt"
+
+        lista_a_file(mtf_encoded, mtf_file)
+        alphabet_to_file(alphabet, alpha_file)
+
+        loaded_mtf = load_lista_de_file(mtf_file)
+        loaded_alpha = load_alphabet_from_file(alpha_file)
+        bwt_recovered = decode_move_to_front(loaded_mtf, loaded_alpha)
+        recovered_text = invert_bwt(bwt_recovered)
+
+        reversible = (text == recovered_text)
         
         # Mostrar resultados
         print(f"   Resultados:")
-        print(f"   - Tamaño original: {original_size} bytes")
+        """print(f"   - Tamaño original: {original_size} bytes")
         print(f"   - Tamaño BWT: {bwt_size} bytes")
         print(f"   - Ratio: {ratio:.3f}")
         print(f"   - Tiempo SA: {sa_time:.2f}s")
         print(f"   - Tiempo BWT: {bwt_time:.2f}s")
         print(f"   - Reversible: {'SI' if reversible else 'NO'}")
-        print(f"   - Archivo BWT: {bwt_filename}")
+        print(f"   - Archivo BWT: {bwt_filename}")"""
+        print(f"   - Longitud original: {len(text)}")
+        print(f"   - Longitud BWT: {len(bwt)}")
+        print(f"   - Longitud MTF: {len(mtf_encoded)}")
+        print(f"   - Reversible total: {'Sí' if reversible else 'No'}")
+
         
+        
+        """
         return {
             'filename': filename,
             'original_size': original_size,
@@ -144,7 +208,7 @@ def process_text_file(filename, max_chars=5000):
             'bwt_time': bwt_time,
             'reversible': reversible,
             'bwt_file': bwt_filename
-        }
+        }"""
         
     except FileNotFoundError:
         print(f"   ERROR: Archivo no encontrado")
@@ -162,14 +226,16 @@ if __name__ == "__main__":
             files_to_process.append(file)
     
     if files_to_process:
-        results = []
+        #results = []
         for file in files_to_process:
-            result = process_text_file(file, max_chars=5000)  
-            if result:
-                results.append(result)
+            #result = process_text_file(file, max_chars=5000)  
+            #if result:
+            #    results.append(result)
+            process_text_file(file)
         
         # Reporte  de ESTADISTICAS 
-        print(f"\n" + "="*60)
+        
+        """print(f"\n" + "="*60)
         print("REPORTE - COMPRESION BWT")
         print("="*60)
         print(f"{'ARCHIVO':<15} {'ORIGINAL':<10} {'BWT':<10} {'RATIO':<8} {'TIEMPO':<8} {'REVERSIBLE'}")
@@ -180,7 +246,7 @@ if __name__ == "__main__":
         
         print(f"Archivos BWT generados:")
         for res in results:
-            print(f"  - {res['bwt_file']}")
+            print(f"  - {res['bwt_file']}")"""
             
     else:
         print("No se encontraron archivos")
