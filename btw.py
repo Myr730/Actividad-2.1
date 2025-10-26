@@ -99,7 +99,7 @@ def decode_move_to_front(encoded, alphabet): #Decodificamos.
         mtf_lista.insert(0, char)
     return ''.join(decoded)
 
-"""def save_bwt_to_file(bwt_string, filename):
+def save_bwt_to_file(bwt_string, filename):
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(bwt_string)
     print(f"   BWT guardada en: {filename}")
@@ -107,7 +107,7 @@ def decode_move_to_front(encoded, alphabet): #Decodificamos.
 
 def load_bwt_from_file(filename):
     with open(filename, 'r', encoding='utf-8') as f:
-        return f.read().strip()"""
+        return f.read().strip()
         
 def lista_a_file(data_list, filename):
     with open(filename, 'w', encoding='utf-8') as f:
@@ -142,7 +142,7 @@ def process_text_file(filename, max_chars=500000):
             print(f"   (limitado a {max_chars} caracteres para prueba rapida)")
         
         # calcular Suffix Array
-        """start_time = time.time()
+        start_time = time.time()
         sa = suffix_array(text + '$')
         sa_time = time.time() - start_time
         
@@ -163,7 +163,7 @@ def process_text_file(filename, max_chars=500000):
         # Calcular metricas - MEDICIoN DE TAMAÑOS
         original_size = len(text.encode('utf-8'))
         bwt_size = len(bwt.encode('utf-8'))
-        ratio = bwt_size / original_size"""
+        ratio = bwt_size / original_size
         
         sa = suffix_array(text + '$')
         bwt = build_bwt_for_compression(text, sa)
@@ -184,21 +184,18 @@ def process_text_file(filename, max_chars=500000):
         
         # Mostrar resultados
         print(f"   Resultados:")
-        """print(f"   - Tamaño original: {original_size} bytes")
+        print(f"   - Tamaño original: {original_size} bytes")
         print(f"   - Tamaño BWT: {bwt_size} bytes")
         print(f"   - Ratio: {ratio:.3f}")
         print(f"   - Tiempo SA: {sa_time:.2f}s")
         print(f"   - Tiempo BWT: {bwt_time:.2f}s")
         print(f"   - Reversible: {'SI' if reversible else 'NO'}")
-        print(f"   - Archivo BWT: {bwt_filename}")"""
+        print(f"   - Archivo BWT: {bwt_filename}")
         print(f"   - Longitud original: {len(text)}")
         print(f"   - Longitud BWT: {len(bwt)}")
         print(f"   - Longitud MTF: {len(mtf_encoded)}")
         print(f"   - Reversible total: {'Sí' if reversible else 'No'}")
 
-        
-        
-        """
         return {
             'filename': filename,
             'original_size': original_size,
@@ -208,7 +205,7 @@ def process_text_file(filename, max_chars=500000):
             'bwt_time': bwt_time,
             'reversible': reversible,
             'bwt_file': bwt_filename
-        }"""
+        }
         
     except FileNotFoundError:
         print(f"   ERROR: Archivo no encontrado")
@@ -226,16 +223,16 @@ if __name__ == "__main__":
             files_to_process.append(file)
     
     if files_to_process:
-        #results = []
+        results = []
         for file in files_to_process:
-            #result = process_text_file(file, max_chars=5000)  
-            #if result:
-            #    results.append(result)
+            result = process_text_file(file, max_chars=5000)  
+            if result:
+                results.append(result)
             process_text_file(file)
         
         # Reporte  de ESTADISTICAS 
         
-        """print(f"\n" + "="*60)
+        print(f"\n" + "="*60)
         print("REPORTE - COMPRESION BWT")
         print("="*60)
         print(f"{'ARCHIVO':<15} {'ORIGINAL':<10} {'BWT':<10} {'RATIO':<8} {'TIEMPO':<8} {'REVERSIBLE'}")
@@ -246,7 +243,7 @@ if __name__ == "__main__":
         
         print(f"Archivos BWT generados:")
         for res in results:
-            print(f"  - {res['bwt_file']}")"""
+            print(f"  - {res['bwt_file']}")
             
     else:
         print("No se encontraron archivos")
